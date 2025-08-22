@@ -10,7 +10,7 @@ repositories {
     // other repositories
     maven {
         name = "dynomakeRepository"
-        url = uri("https://maven.dynomake.space/releases")
+        url = uri("https://maven.dynomake.it/releases")
     }
 }
 
@@ -27,7 +27,7 @@ Repository:
 ```xml
 <repository>
     <id>dynomakeRepository</id>
-    <url>https://maven.dynomake.space/releases</url>
+    <url>https://maven.dynomake.it/releases</url>
 </repository>
 ```
 
