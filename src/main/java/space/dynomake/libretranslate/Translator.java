@@ -11,7 +11,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
 
 @UtilityClass
 public class Translator {
@@ -33,7 +32,7 @@ public class Translator {
             HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
             httpConn.setRequestMethod("POST");
 
-            httpConn.setRequestProperty("accept", "application/json");
+            httpConn.setRequestProperty("Accept", "application/json");
             httpConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             httpConn.setRequestProperty("User-Agent", "Mozilla/5.0");
 
@@ -52,11 +51,7 @@ public class Translator {
             InputStream responseStream = httpConn.getInputStream();
 
             InputStreamReader reader = new InputStreamReader(responseStream, StandardCharsets.UTF_8);
-            
-            Scanner s = new Scanner(reader).useDelimiter("\\A");
-            String response = s.hasNext() ? s.next() : "";
-
-            return JsonUtil.from(response, TranslateResponse.class);
+            return JsonUtil.from(reader, TranslateResponse.class);
         } catch (Exception e) {
             if (e instanceof RuntimeException)
                 throw (RuntimeException) e;
