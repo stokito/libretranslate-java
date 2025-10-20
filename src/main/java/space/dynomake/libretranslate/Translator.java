@@ -55,8 +55,6 @@ public class Translator {
         } catch (Exception e) {
             if (e instanceof RuntimeException)
                 throw (RuntimeException) e;
-
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
