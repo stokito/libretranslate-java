@@ -7,8 +7,10 @@ import space.dynomake.libretranslate.exception.BadTranslatorResponseException;
 import space.dynomake.libretranslate.type.TranslateResponse;
 import space.dynomake.libretranslate.util.JsonUtil;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 @UtilityClass
