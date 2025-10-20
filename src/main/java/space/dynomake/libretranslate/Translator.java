@@ -16,12 +16,14 @@ import java.io.OutputStreamWriter;
 import java.net.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static space.dynomake.libretranslate.ApiProviders.API_URL_FEDILAB;
 
 @UtilityClass
 public class Translator {
 
+
     @Setter
-    private String urlApi = "https://translate.fedilab.app/translate";
+    private String urlApi = API_URL_FEDILAB;
 
     @Setter
     private String apiKey = "unknown";
