@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.UtilityClass;
 import space.dynomake.libretranslate.exception.BadTranslatorResponseException;
+import space.dynomake.libretranslate.type.LanguageTargets;
 import space.dynomake.libretranslate.type.TranslateResponse;
 import space.dynomake.libretranslate.util.JsonUtil;
 
@@ -99,4 +100,56 @@ public class Translator {
         if (to == Language.NONE) return request;
         return translate("auto", to.getCode(), request);
     }
+
+
+    /**
+     * Get supported languages for translation
+     * @param displayLanguage specify language for Name field. E.g. when "ru" then en lang Name will be "английский"
+     * @return an array of languages and target languages to which they can be translated
+     */
+    public LanguageTargets[] supportedLanguages(String displayLanguage) {
+        HttpURLConnection httpConn = null;
+        try {
+            String languagesApi = getApiBaseUrl() + "/languages";
+            URL url = new URL(languagesApi);
+            httpConn = (HttpURLConnection) url.openConnection();
+            httpConn.setConnectTimeout(connectTimeout);
+            httpConn.setReadTimeout(readTimeout);
+            httpConn.setUseCaches(false);
+            httpConn.setRequestMethod("GET");
+
+            if (displayLanguage != null) {
+                httpConn.setRequestProperty("Accept-Language", displayLanguage);
+            }
+            httpConn.setRequestProperty("Accept", "application/json");
+            httpConn.setRequestProperty("User-Agent", "Mozilla/5.0");
+
+
+            // Check response code before reading
+            int responseCode = httpConn.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                throw new BadTranslatorResponseException(responseCode, languagesApi);
+            }
+
+            try (InputStream responseStream = httpConn.getInputStream();
+                 BufferedReader reader = new BufferedReader(new InputStreamReader(responseStream, UTF_8))) {
+                return JsonUtil.from(reader, LanguageTargets[].class);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Network error during translation", e);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Translation failed", e);
+        } finally {
+            if (httpConn != null) {
+                httpConn.disconnect();
+            }
+        }
+    }
+
+    private String getApiBaseUrl() {
+        return urlApi.substring(0, urlApi.length() - "/translate".length());
+    }
+
 }
