@@ -7,12 +7,15 @@ import space.dynomake.libretranslate.exception.BadTranslatorResponseException;
 import space.dynomake.libretranslate.type.TranslateResponse;
 import space.dynomake.libretranslate.util.JsonUtil;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @UtilityClass
 public class Translator {
@@ -40,12 +43,14 @@ public class Translator {
 
             httpConn.setDoOutput(true);
 
-            OutputStreamWriter writer = new OutputStreamWriter(httpConn.getOutputStream());
-
-            writer.write("q=" + URLEncoder.encode(request, "UTF-8") + "&source=" + from + "&api_key=" + apiKey + "&target=" + to + "&format=text");
-            writer.flush();
-            writer.close();
-            httpConn.getOutputStream().close();
+            // Build request body
+            String requestBody = "q=" + URLEncoder.encode(request, "UTF-8") + "&source=" + from + "&target=" + to + "&format=text";
+            // Write request
+            try (OutputStream outputStream = httpConn.getOutputStream();
+                 OutputStreamWriter writer = new OutputStreamWriter(outputStream, UTF_8)) {
+                writer.write(requestBody);
+                writer.flush();
+            }
 
             // Check response code before reading
             int responseCode = httpConn.getResponseCode();
@@ -53,10 +58,10 @@ public class Translator {
                 throw new BadTranslatorResponseException(responseCode, urlApi);
             }
 
-            InputStream responseStream = httpConn.getInputStream();
-
-            InputStreamReader reader = new InputStreamReader(responseStream, StandardCharsets.UTF_8);
-            return JsonUtil.from(reader, TranslateResponse.class);
+            try (InputStream responseStream = httpConn.getInputStream();
+                 BufferedReader reader = new BufferedReader(new InputStreamReader(responseStream, UTF_8))) {
+                return JsonUtil.from(reader, TranslateResponse.class);
+            }
         } catch (IOException e) {
             throw new RuntimeException("Network error during translation", e);
         } catch (RuntimeException e) {
