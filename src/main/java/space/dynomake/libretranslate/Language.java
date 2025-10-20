@@ -12,6 +12,7 @@ import java.util.Arrays;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum Language {
 
+    NONE("none"),
     RUSSIAN("ru"),
     ENGLISH("en"),
     ARABIC("ar"),
@@ -41,8 +42,7 @@ public enum Language {
     SPANISH("es"),
     SWEDISH("sv"),
     TURKISH("tr"),
-    UKRAINIAN("uk"),
-    NONE("none")
+    UKRAINIAN("uk")
     ;
 
     String code;
