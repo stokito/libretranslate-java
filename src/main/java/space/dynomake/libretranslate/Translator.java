@@ -35,6 +35,7 @@ public class Translator {
 
             httpConn.setRequestProperty("accept", "application/json");
             httpConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            httpConn.setRequestProperty("User-Agent", "Mozilla/5.0");
 
             httpConn.setDoOutput(true);
 
