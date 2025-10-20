@@ -26,6 +26,12 @@ public class Translator {
     @Setter
     private String apiKey = "unknown";
 
+    @Setter
+    private static int connectTimeout = 5000; // 5 seconds
+
+    @Setter
+    private static int readTimeout = 5000;
+
     public String translate(@NonNull String from, @NonNull String to, @NonNull String request) {
         return translateDetect(from, to, request).getTranslatedText();
     }
@@ -35,6 +41,9 @@ public class Translator {
         try {
             URL url = new URL(urlApi);
             httpConn = (HttpURLConnection) url.openConnection();
+            httpConn.setConnectTimeout(connectTimeout);
+            httpConn.setReadTimeout(readTimeout);
+            httpConn.setUseCaches(false);
             httpConn.setRequestMethod("POST");
 
             httpConn.setRequestProperty("Accept", "application/json");
