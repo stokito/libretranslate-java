@@ -6,6 +6,8 @@ import lombok.experimental.UtilityClass;
 import space.dynomake.libretranslate.exception.BadTranslatorResponseException;
 import space.dynomake.libretranslate.type.TranslateResponse;
 import space.dynomake.libretranslate.util.JsonUtil;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -26,10 +28,10 @@ public class Translator {
     }
 
     public TranslateResponse translateDetect(@NonNull String from, @NonNull String to, @NonNull String request) {
+        HttpURLConnection httpConn = null;
         try {
-
             URL url = new URL(urlApi);
-            HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+            httpConn = (HttpURLConnection) url.openConnection();
             httpConn.setRequestMethod("POST");
 
             httpConn.setRequestProperty("Accept", "application/json");
@@ -45,17 +47,26 @@ public class Translator {
             writer.close();
             httpConn.getOutputStream().close();
 
-            if (!(httpConn.getResponseCode() / 100 == 2))
-                throw new BadTranslatorResponseException(httpConn.getResponseCode(), urlApi);
+            // Check response code before reading
+            int responseCode = httpConn.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                throw new BadTranslatorResponseException(responseCode, urlApi);
+            }
 
             InputStream responseStream = httpConn.getInputStream();
 
             InputStreamReader reader = new InputStreamReader(responseStream, StandardCharsets.UTF_8);
             return JsonUtil.from(reader, TranslateResponse.class);
+        } catch (IOException e) {
+            throw new RuntimeException("Network error during translation", e);
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
-            if (e instanceof RuntimeException)
-                throw (RuntimeException) e;
-            throw new RuntimeException(e);
+            throw new RuntimeException("Translation failed", e);
+        } finally {
+            if (httpConn != null) {
+                httpConn.disconnect();
+            }
         }
     }
 
