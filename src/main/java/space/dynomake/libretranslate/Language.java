@@ -61,8 +61,9 @@ public enum Language {
     TAGALOG("tl", "Tagalog"),
     THAI("th", "Thai"),
     TURKISH("tr", "Turkish"),
-    UKRANIAN("uk", "Ukranian"),
+    UKRAINIAN("uk", "Ukrainian"),
     URDU("ur", "Urdu"),
+    VIETNAMESE("vi", "Vietnamese")
     ;
 
     String code;
