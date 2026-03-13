@@ -27,7 +27,7 @@ public class Translator {
     private String urlApi = API_URL_FEDILAB;
 
     @Setter
-    private String apiKey = "unknown";
+    private String apiKey;
 
     @Setter
     private static int connectTimeout = 5000; // 5 seconds
@@ -40,6 +40,10 @@ public class Translator {
     }
 
     public TranslateResponse translateDetect(@NonNull String from, @NonNull String to, @NonNull String request) {
+        return translateDetect(from, to, request, "text");
+    }
+
+    public TranslateResponse translateDetect(@NonNull String from, @NonNull String to, @NonNull String request, @NonNull String format) {
         HttpURLConnection httpConn = null;
         try {
             URL url = new URL(urlApi);
@@ -56,7 +60,10 @@ public class Translator {
             httpConn.setDoOutput(true);
 
             // Build request body
-            String requestBody = "q=" + URLEncoder.encode(request, "UTF-8") + "&source=" + from + "&target=" + to + "&format=text";
+            String requestBody = "q=" + URLEncoder.encode(request, "UTF-8") + "&source=" + from + "&target=" + to + "&format=" + format;
+            if (apiKey != null && !apiKey.isEmpty()) {
+                requestBody += "&api_key=" + apiKey;
+            }
             // Write request
             try (OutputStream outputStream = httpConn.getOutputStream();
                  OutputStreamWriter writer = new OutputStreamWriter(outputStream, UTF_8)) {
